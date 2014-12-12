@@ -2,7 +2,7 @@ import scrapy
 from touchlineid.items import TouchlineidItem
 import urlparse
 import years
-
+import pickle
 
 class TouchlineidSpider(scrapy.Spider):
     name = "touchlineid-spider"
@@ -10,6 +10,7 @@ class TouchlineidSpider(scrapy.Spider):
 
     def start_requests(self):
         urls = []
+        
         for eachCountry in years.years.keys():
             CTID = years.years[str(eachCountry)]['CTID']
             CPID = years.years[str(eachCountry)]['CPID']
