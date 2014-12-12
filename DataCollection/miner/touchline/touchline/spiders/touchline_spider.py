@@ -3,24 +3,41 @@ from touchline.items import TouchlineItem
 import urlparse
 import ids
 
+
 class TouchlineSpider(scrapy.Spider):
     name = "touch-line-spider"
     allowed_domains = ["wettbasis.touch-line.com"]
    
     def start_requests(self):
         urls = []
-        for eachCountry in ids.ids.keys():
-            CTID = ids.ids[str(eachCountry)]['CTID'] 
-            CPID = ids.ids[str(eachCountry)]['CPID']
-            for eachID in ids.ids[str(eachCountry)]['IDs']:
-                startID = eachID[0]
-                endID = eachID[1]
-                for game_id in range(startID, endID,1):
-                    urls.append(scrapy.FormRequest(url="http://wettbasis.touch-line.com/",\
+
+        filein = open('entries.txt','rb')
+        lines = filein.readlines()
+
+        for each in lines:
+            CTID = each.split(',')[0]
+            CPID = each.split(',')[1]
+            MAID = each.split(',')[2].replace('\n','')
+            urls.append(scrapy.FormRequest(url="http://wettbasis.touch-line.com/",\
 					method="GET",\
 					formdata={'Lang':'0','CTID':CTID, 'CPID':CPID,\
-					'MAID': str(game_id), 'pStr':'Match_Details'},
+					'MAID': str(MAID), 'pStr':'Match_Details'},
 					callback=self.parse))
+        return urls
+
+
+#        for eachCountry in ids.ids.keys():
+#            CTID = ids.ids[str(eachCountry)]['CTID'] 
+#            CPID = ids.ids[str(eachCountry)]['CPID']
+#            for eachID in ids.ids[str(eachCountry)]['IDs']:
+#                startID = eachID[0]
+#                endID = eachID[1]
+#                for game_id in range(startID, endID,1):
+#                    urls.append(scrapy.FormRequest(url="http://wettbasis.touch-line.com/",\
+#					method="GET",\
+#					formdata={'Lang':'0','CTID':CTID, 'CPID':CPID,\
+#					'MAID': str(game_id), 'pStr':'Match_Details'},
+#					callback=self.parse))
 
         #for game_id in range(493586,493725,1):
         #    urls.append(scrapy.FormRequest(url="http://wettbasis.touch-line.com/",\
@@ -28,7 +45,6 @@ class TouchlineSpider(scrapy.Spider):
 #					formdata={'Lang':'0','CTID':'11', 'CPID':'4',\
 #					'MAID': str(game_id), 'pStr':'Match_Details'},
 #					callback=self.parse))
-        return urls
 
     def get_season(self,date):
         date_array = date.split("/")
